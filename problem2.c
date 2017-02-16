@@ -17,7 +17,7 @@ void pb2(){
 	
 	float temp;
 	float *x = (float *)(malloc(MAX*sizeof(float)));
-	int two = 10;
+
 	for (i = 0; i <= MAX; i++){
 		x[i] = ((float)rand()/(float)(RAND_MAX));
 	}
@@ -32,11 +32,10 @@ void pb2(){
 			clock_gettime(CLOCK_MONOTONIC, &end);	/* mark the end time */
 			diff = (double) BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
 			diff = diff/(n*K);
-			printf("%d %lf\n", two, diff);
-			fprintf(fp, "%d,%0.2lf\n", two, diff);
+			printf("%d %lf\n", s, diff);
+			fprintf(fp, "%d,%0.2lf\n", s, diff);
 
 		}
-		two += 1;
 	}
 	fclose(fp);
 }
