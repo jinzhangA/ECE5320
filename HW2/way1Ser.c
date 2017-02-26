@@ -75,11 +75,15 @@ void printMat(int **mat){
 }
 
 int main(int argc, char **argv){
-	for (power = 4; power < 12; power++){
+	FILE *fp;
+	fp=fopen("way1Ser.csv","w+")
+	for (power = 4; power < 15; power++){
 		N = pow(2, power);
 		generateMat();
 		way1Sort(mat);
 		free(mat);
+		fprintf(fp, "%d, %llu\n", power, (long long unsigned int) timer);
 	}
+	fclose(fp);
 	exit(0);
 }

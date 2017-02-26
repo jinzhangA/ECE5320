@@ -184,15 +184,16 @@ void printMat(int **mat){
 }
 
 int main(int argc, char **argv){
-	for (power = 4; power < 12; power++){
+	FILE *fp;
+	fp=fopen("way1Para.csv","w+");
+	for (power = 4; power < 15; power++){
 		N = pow(2, power);
 		generateMat();
-		//	printMat(mat);
-		//	printf("\n");
 		way1Sort(mat);
-		//	printMat(mat);
 		free(mat);
+		fprintf(fp, "%d, %llu\n", s, (long long unsigned int) timer);
 	}
+	fclose(fp);
 	
 	exit(0);
 }

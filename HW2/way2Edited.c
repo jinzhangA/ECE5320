@@ -228,8 +228,9 @@ int main(int argc, char **argv){
 		way2Sort();
 		free(mat);
 		printf("2^%d time = %llu nanoseconds\n", power, (long long unsigned int) timer);
+		fprintf(fp, "%d, %llu\n", power, (long long unsigned int) timer);
 	}
-	fprintf(fp, "%d, %llu\n", s, (long long unsigned int) timer);
+	
 	fclose(fp);
 	exit(0);
 }
