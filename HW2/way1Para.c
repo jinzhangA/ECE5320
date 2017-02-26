@@ -5,33 +5,35 @@
 #include <math.h>
 #include <pthread.h>
 
-#define N 4
+#define N 1000
 #define SEED 2
 #define BILLION 1000000000L
-#define NUM_THRDS 1
-int **generateMat();
+#define MAX_NUM_THRDS 8
+void **generateMat();
 void printMat(int **mat);
 int way1Sort(int **mat);
-void maxAndSwap(int **mat);
+void maxAndSwap(int **mat, int col);
 void *paraMax(void *arg);
 
 int maxVal = 0;
+int maxRow = 0;
 int **mat;
+uint64_t timer = 0;
 
-pthread_t thr_id[NUM_THRDS];
+pthread_t thr_id[MAX_NUM_THRDS];
 pthread_mutex_t maxLock;
-
+pthread_mutex_t maxRowLock;
 
 struct ptArg{
 	int start;
 	int col;
+	int size;
 };
 
-struct ptArg thread_data_array[NUM_THRDS];
-int **generateMat() {
-	int i, j;
-	int **mat;
-	
+struct ptArg thread_data_array[MAX_NUM_THRDS];
+
+void **generateMat() {
+	int i, j;	
 	mat = (int **)malloc(N * sizeof(int*));
 	srand(SEED);
 	
@@ -41,38 +43,97 @@ int **generateMat() {
 			mat[i][j] = rand()%1000;
 		}
 	}
-	
-	return mat;
 }
 
-void maxAndSwap(int **mat){
-	struct timespec start, finish;
+int way1Sort(int **mat){
+	int i;
+	int j;
+	
+//	uint64_t diff;
+//	struct timespec start, end;
+//	clock_gettime(CLOCK_MONOTONIC, &start);	
+	for (i = 0; i < N; i++){
+		maxAndSwap(mat, i);
+	}
+//	clock_gettime(CLOCK_MONOTONIC, &end);
+//	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
+	printf("elapsed process CPU time = %llu nanoseconds\n", (long long unsigned int) timer);
+	return 0;
+}
+
+void maxAndSwap(int **mat, int col){
+//	struct timespec start, finish;
+	uint64_t diff;
+	struct timespec start, end;
 	int rc, ntime, stime;
-	long i;
-	long j;
+	int i;
+	int j;
+	int stepSize;
+	int colLength = N - col;
+	int numThreads;
 	void *status;
 	pthread_attr_t attr;
 
 	pthread_mutex_init (&maxLock, NULL);
+	pthread_mutex_init (&maxRowLock, NULL);
 	pthread_attr_init (&attr);
 	pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE);
 	clock_gettime(CLOCK_REALTIME, &start);
+
+	maxVal = mat[col][col];
+	maxRow = col;
 	
-	for (i = 0; i < NUM_THRDS; i++){
+	
+	if (colLength > MAX_NUM_THRDS * 2){
+		numThreads = MAX_NUM_THRDS;
+		stepSize = colLength/numThreads;
+	}else{
+		numThreads = colLength/2;
+//		printf("numThreads%d col%d\n", numThreads, col);
+		stepSize = 2;
+	}
+	
+	for (i = 0; i < numThreads - 1; i++){
+		thread_data_array[i].start = col + i*stepSize;
+		thread_data_array[i].size = stepSize;
+		thread_data_array[i].col = col;
+	}
+	
+	thread_data_array[numThreads - 1].start = col + (numThreads - 1)*stepSize;
+	thread_data_array[numThreads - 1].size = colLength - (numThreads - 1)*stepSize;
+	thread_data_array[numThreads - 1].col = col;
+	
+
+	clock_gettime(CLOCK_MONOTONIC, &start);	
+	
+	for (i = 0; i < numThreads; i++){
 		rc = pthread_create(&thr_id[i], &attr, paraMax, (void *)&thread_data_array[i]);
 	}
 	pthread_attr_destroy(&attr);
 	
-	for (i = 0; i < NUM_THRDS; i++){
+	for (i = 0; i < numThreads; i++){
 		pthread_join(thr_id[i], &status);
 	}
 	
-	clock_gettime(CLOCK_REALTIME, &finish);
-	ntime = finish.tv_nsec - start.tv_nsec;
-	stime = (int) finish.tv_nsec - (int) start.tv_nsec;
-	printf ("%d", stime);
+	clock_gettime(CLOCK_MONOTONIC, &end);
+	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
+	timer += diff;
 	pthread_mutex_destroy(&maxLock);
-	pthread_exit(NULL);
+	pthread_mutex_destroy(&maxRowLock);
+//	printf("max is: %d row %d\n", maxVal, maxRow);
+	
+	int *temp = mat[col];
+	mat[col] = mat[maxRow];
+	mat[maxRow] = temp;
+
+//	printMat(mat);
+	
+//	clock_gettime(CLOCK_REALTIME, &finish);
+//	ntime = finish.tv_nsec - start.tv_nsec;
+//	stime = (int) finish.tv_nsec - (int) start.tv_nsec;
+//	printf ("%d", stime);
+	
+//	pthread_exit(NULL);
 }
 
 void *paraMax(void *arg){
@@ -81,20 +142,28 @@ void *paraMax(void *arg){
 	myArg = (struct ptArg *) arg;
 	int start = myArg->start;
 	int col = myArg->col;
-
+	int size = myArg->size;
 	int i;
-	int localMax = 0;
+	int localMax = mat[start][col];
+	int localRowMax = myArg->start;
 	
-	for (i = start; i < N; i++){
+	
+//	printf("start:%d col:%d size:%d\n", start, col, size);
+	for (i = start; i < start + size; i++){
 		if (abs(mat[i][col]) > localMax){
 			localMax = abs(mat[i][col]);
+			localRowMax = i;
 		}
 	}
+//	printf("Local Max value: %d, row: %d\n", localMax, localRowMax);
+	pthread_mutex_lock (&maxLock);
+	pthread_mutex_lock (&maxRowLock);
 	if (localMax > maxVal){
-		pthread_mutex_lock (&maxLock);
 		maxVal = localMax;
-		pthread_mutex_unlock (&maxLock);
+		maxRow = localRowMax;
 	}
+	pthread_mutex_unlock (&maxLock);
+	pthread_mutex_unlock (&maxRowLock);
 	
 	pthread_exit(NULL);
 }
@@ -111,11 +180,11 @@ void printMat(int **mat){
 }
 
 int main(int argc, char **argv){
-	mat = generateMat();
-	printMat(mat);
-	printf("\n");
-	maxAndSwap(mat);
-	printMat(mat);
+	generateMat();
+//	printMat(mat);
+//	printf("\n");
+	way1Sort(mat);
+//	printMat(mat);
 	free(mat);
 	exit(0);
 }
