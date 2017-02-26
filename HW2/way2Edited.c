@@ -3,6 +3,7 @@
 #include <stdint.h>	/* for uint64 definition */
 #include <omp.h>
 #include <time.h>	/* for clock_gettime */
+#include <math.h>
 
 //#define N 4
 #define SEED 2
