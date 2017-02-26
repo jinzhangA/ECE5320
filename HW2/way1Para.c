@@ -61,7 +61,7 @@ int way1Sort(int **mat){
 	}
 //	clock_gettime(CLOCK_MONOTONIC, &end);
 //	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
-	printf("For 2^%d size, time = %llu nanoseconds\n", (long long unsigned int) timer);
+	printf("For 2^%d size, time = %llu nanoseconds\n", power, (long long unsigned int) timer);
 	return 0;
 }
 
