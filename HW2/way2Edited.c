@@ -217,6 +217,8 @@ void copyMat(){
 
 int main(int argc, char **argv){
 	int power;
+	FILE *fp;
+	fp=fopen("way2Para.csv","w+");
 	for (power = 4; power < 12; power++){
 		timer = 0;
 		N = pow(2, power);
@@ -227,5 +229,7 @@ int main(int argc, char **argv){
 		free(mat);
 		printf("2^%d time = %llu nanoseconds\n", power, (long long unsigned int) timer);
 	}
+	fprintf(fp, "%d, %llu\n", s, (long long unsigned int) timer);
+	fclose(fp);
 	exit(0);
 }
