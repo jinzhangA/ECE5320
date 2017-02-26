@@ -40,7 +40,7 @@ int way1Sort(int **mat){
 	}
 	clock_gettime(CLOCK_MONOTONIC, &end);
 	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
-	printf("elapsed process CPU time = %llu nanoseconds\n", (long long unsigned int) diff);
+	printf("2^%d time = %llu nanoseconds\n", power, (long long unsigned int) diff);
 	return 0;
 }
 
@@ -78,10 +78,7 @@ int main(int argc, char **argv){
 	for (power = 4; power < 12; power++){
 		N = pow(2, power);
 		generateMat();
-		//	printMat(mat);
-		//	printf("\n");
 		way1Sort(mat);
-		//	printMat(mat);
 		free(mat);
 	}
 	exit(0);
