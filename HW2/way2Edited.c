@@ -1,3 +1,6 @@
+// Zhuo Chen zc292
+// compile with: gcc -o way2Para way2Edited.c -lm -fopenmp
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>	/* for uint64 definition */
@@ -5,7 +8,6 @@
 #include <time.h>	/* for clock_gettime */
 #include <math.h>
 
-//#define N 4
 #define SEED 2
 #define BILLION 1000000000L
 
@@ -16,7 +18,7 @@ int N;
 
 void **generateMat();
 void printMat(int **mat);
-void way2Sort();
+void way2Sort(int method);
 void copyMat();
 void creatTempMat();
 void mergeSort(int *value, int *index, int n);
@@ -36,7 +38,7 @@ void **generateMat() {
 	}
 }
 
-void way2Sort(){
+void way2Sort(int method){
 	int i;
 	int j, k;
 	int size;
@@ -55,7 +57,8 @@ void way2Sort(){
 			values[j] = mat[j + i][i];
 		}
 		clock_gettime(CLOCK_MONOTONIC, &start);	
-		mergeSort(values, indexs, N - i);
+		if (method == 0) mergeSort(values, indexs, N - i);
+		else mergeSortPara(values, indexs, N - i);
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
 		timer += diff;
@@ -75,9 +78,6 @@ void way2Sort(){
 		free(values);
 		free(indexs);
 	}
-	
-	
-//	printMat(mat);
 }
 
 void mergeSort(int *values, int *indexs, int n){
@@ -217,7 +217,24 @@ void copyMat(){
 
 int main(int argc, char **argv){
 	int power;
+	// code for extracting timing information into csv file
 	FILE *fp;
+	fp=fopen("way2Ser.csv","w+");
+	
+	// looping over different size of matrix and benmark
+	for (power = 4; power < 12; power++){
+		timer = 0;
+		N = pow(2, power);
+		generateMat();
+		creatTempMat();
+		copyMat();
+		way2Sort(0);
+		free(mat);
+		printf("2^%d time = %llu nanoseconds\n", power, (long long unsigned int) timer);
+		fprintf(fp, "%d, %llu\n", power, (long long unsigned int) timer);
+	}
+	fclose(fp);
+	
 	fp=fopen("way2Para.csv","w+");
 	for (power = 4; power < 12; power++){
 		timer = 0;
@@ -225,12 +242,11 @@ int main(int argc, char **argv){
 		generateMat();
 		creatTempMat();
 		copyMat();
-		way2Sort();
+		way2Sort(1);
 		free(mat);
 		printf("2^%d time = %llu nanoseconds\n", power, (long long unsigned int) timer);
 		fprintf(fp, "%d, %llu\n", power, (long long unsigned int) timer);
 	}
-	
 	fclose(fp);
 	exit(0);
 }
