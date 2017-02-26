@@ -11,6 +11,7 @@
 int **mat;
 int **tempMat;
 uint64_t timer;
+int N;
 
 void **generateMat();
 void printMat(int **mat);
