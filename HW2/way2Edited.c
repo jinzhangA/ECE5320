@@ -216,6 +216,7 @@ void copyMat(){
 
 
 int main(int argc, char **argv){
+	int power;
 	for (power = 4; power < 12; power++){
 		timer = 0;
 		N = pow(2, power);
