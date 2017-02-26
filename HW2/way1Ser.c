@@ -78,6 +78,7 @@ int main(int argc, char **argv){
 	FILE *fp;
 	fp=fopen("way1Ser.csv","w+");
 	for (power = 4; power < 15; power++){
+		timer = 0;
 		N = pow(2, power);
 		generateMat();
 		way1Sort(mat);
