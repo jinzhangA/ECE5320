@@ -4,8 +4,9 @@
 #include <time.h>	/* for clock_gettime */
 #include <math.h>
 #include <pthread.h>
+#include <math.h>
 
-#define N 1000
+//#define N 1000
 #define SEED 2
 #define BILLION 1000000000L
 #define MAX_NUM_THRDS 8
@@ -18,7 +19,9 @@ void *paraMax(void *arg);
 int maxVal = 0;
 int maxRow = 0;
 int **mat;
+int N;
 uint64_t timer = 0;
+
 
 pthread_t thr_id[MAX_NUM_THRDS];
 pthread_mutex_t maxLock;
@@ -180,11 +183,16 @@ void printMat(int **mat){
 }
 
 int main(int argc, char **argv){
-	generateMat();
-//	printMat(mat);
-//	printf("\n");
-	way1Sort(mat);
-//	printMat(mat);
-	free(mat);
+	int i = 4;
+	for (i = 4; i < 12; i++){
+		N = pow(2, i);
+		generateMat();
+		//	printMat(mat);
+		//	printf("\n");
+		way1Sort(mat);
+		//	printMat(mat);
+		free(mat);
+	}
+	
 	exit(0);
 }
