@@ -186,7 +186,7 @@ void printMat(int **mat){
 int main(int argc, char **argv){
 	FILE *fp;
 	fp=fopen("way1Para.csv","w+");
-	for (power = 4; power < 15; power++){
+	for (power = 4; power < 12; power++){
 		N = pow(2, power);
 		timer = 0;
 		generateMat();
