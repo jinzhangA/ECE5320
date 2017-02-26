@@ -61,7 +61,7 @@ int way1Sort(int **mat){
 	}
 //	clock_gettime(CLOCK_MONOTONIC, &end);
 //	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
-	printf("For 2^%d size, time = %llu nanoseconds\n", power, (long long unsigned int) timer);
+	
 	return 0;
 }
 
@@ -188,9 +188,11 @@ int main(int argc, char **argv){
 	fp=fopen("way1Para.csv","w+");
 	for (power = 4; power < 15; power++){
 		N = pow(2, power);
+		timer = 0;
 		generateMat();
 		way1Sort(mat);
 		free(mat);
+		printf("For 2^%d size, time = %llu nanoseconds\n", power, (long long unsigned int) timer);
 		fprintf(fp, "%d, %llu\n", power, (long long unsigned int) timer);
 	}
 	fclose(fp);
