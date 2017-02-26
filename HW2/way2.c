@@ -33,13 +33,13 @@ void way2Sort(){
 	int i;
 	int j;
 	int size;
-	int *values, *indexs, *indexCache;
+	int *values, *indexs, **indexCache;
 	
 	uint64_t diff;
 	struct timespec start, end;
 	clock_gettime(CLOCK_MONOTONIC, &start);	
 	 
-	for (i = 0; i < N; i++){
+	for (i = 0; i < N - 1; i++){
 		size = N - i;
 		values = (int*)malloc(size*sizeof(int));
 		indexs = (int*)malloc(size*sizeof(int));
@@ -50,19 +50,21 @@ void way2Sort(){
 		}
 //		printf("\n");
 		mergeSort(values, indexs, N - i);
-//		for (j = 0; j < size; j++){
-//			printf("%d ", indexs[j]);
-//		}
-//		printf("\n");
-		indexCache = (int*)malloc(size*sizeof(int));
 		for (j = 0; j < size; j++){
-			indexCache[j] = mat[i + j];
+			printf("%d ", indexs[j]);
+		}
+		printf("\n");
+		indexCache = (int**)malloc(size*sizeof(int *));
+		for (j = 0; j < size; j++){
+			indexCache[j] = mat[j + i];
 		}
 		for (j = 0; j < size; j++){
 			printf("cache: %d ", indexCache[j]);
 		}
 		printf("\n");
+		
 		for (j = i; j < size + i; j++){
+			printf("j: %d\n", j);
 			mat[j] = indexCache[indexs[j - i]];
 		}
 		free(values);
