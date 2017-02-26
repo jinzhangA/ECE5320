@@ -1,3 +1,6 @@
+// Zhuo Chen zc292
+// compile with: gcc way1Ser.c -o way1Ser -lm
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>	/* for uint64 definition */
@@ -16,6 +19,7 @@ int power;
 uint64_t timer;
 int N;
 
+// generate the matrix
 void **generateMat() {
 	int i, j;
 	mat = (int **)malloc(N * sizeof(int*));
@@ -36,6 +40,7 @@ int way1Sort(int **mat){
 	uint64_t diff;
 	struct timespec start, end;
 	clock_gettime(CLOCK_MONOTONIC, &start);	
+	// for each column, perform sorting and swaping.
 	for (i = 0; i < N; i++){
 		maxAndSwap(mat, i);
 	}
@@ -44,6 +49,7 @@ int way1Sort(int **mat){
 	return 0;
 }
 
+// find the maxmum row and swap it with the diagonal element;
 void maxAndSwap(int **mat, int col){
 	int i;
 	int j;
@@ -75,8 +81,11 @@ void printMat(int **mat){
 }
 
 int main(int argc, char **argv){
+	// code for extracting timing information into csv file
 	FILE *fp;
 	fp=fopen("way1Ser.csv","w+");
+	
+	// looping over different size of matrix and benmark
 	for (power = 4; power < 12; power++){
 		timer = 0;
 		N = pow(2, power);

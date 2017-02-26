@@ -1,5 +1,5 @@
 // Zhuo Chen zc292
-// compile with: gcc -o way2Para way2Edited.c -lm -fopenmp
+// compile with: gcc -o way2 zc292_hw2_openmp_sort.c -lm -fopenmp
 
 #include <stdio.h>
 #include <stdlib.h>

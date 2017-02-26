@@ -1,3 +1,6 @@
+// Zhuo Chen zc292
+// compile with: gcc way1Para.c -o way1Para -lpthread -lm
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <stdint.h>	/* for uint64 definition */
@@ -6,7 +9,6 @@
 #include <pthread.h>
 #include <math.h>
 
-//#define N 1000
 #define SEED 2
 #define BILLION 1000000000L
 #define MAX_NUM_THRDS 8
@@ -36,6 +38,7 @@ struct ptArg{
 
 struct ptArg thread_data_array[MAX_NUM_THRDS];
 
+// generate the matrix
 void **generateMat() {
 	int i, j;	
 	mat = (int **)malloc(N * sizeof(int*));
@@ -53,20 +56,14 @@ int way1Sort(int **mat){
 	int i;
 	int j;
 	
-//	uint64_t diff;
-//	struct timespec start, end;
-//	clock_gettime(CLOCK_MONOTONIC, &start);	
 	for (i = 0; i < N; i++){
 		maxAndSwap(mat, i);
 	}
-//	clock_gettime(CLOCK_MONOTONIC, &end);
-//	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
 	
 	return 0;
 }
 
 void maxAndSwap(int **mat, int col){
-//	struct timespec start, finish;
 	uint64_t diff;
 	struct timespec start, end;
 	int rc, ntime, stime;
@@ -83,17 +80,18 @@ void maxAndSwap(int **mat, int col){
 	pthread_attr_init (&attr);
 	pthread_attr_setdetachstate (&attr, PTHREAD_CREATE_JOINABLE);
 	clock_gettime(CLOCK_REALTIME, &start);
-
+	
+	// initialize the malVal and row each time running;
 	maxVal = mat[col][col];
 	maxRow = col;
 	
-	
+	// Determine the number of treads. Will be explained in detail
+		// in the code write up
 	if (colLength > MAX_NUM_THRDS * 2){
 		numThreads = MAX_NUM_THRDS;
 		stepSize = colLength/numThreads;
 	}else{
 		numThreads = colLength/2;
-//		printf("numThreads%d col%d\n", numThreads, col);
 		stepSize = 2;
 	}
 	
@@ -107,59 +105,56 @@ void maxAndSwap(int **mat, int col){
 	thread_data_array[numThreads - 1].size = colLength - (numThreads - 1)*stepSize;
 	thread_data_array[numThreads - 1].col = col;
 	
-
+	// get the start time
 	clock_gettime(CLOCK_MONOTONIC, &start);	
-	
+	// creat the threads
 	for (i = 0; i < numThreads; i++){
 		rc = pthread_create(&thr_id[i], &attr, paraMax, (void *)&thread_data_array[i]);
 	}
 	pthread_attr_destroy(&attr);
 	
+	// join the threads to run them
 	for (i = 0; i < numThreads; i++){
 		pthread_join(thr_id[i], &status);
 	}
-	
+	// get the start time
 	clock_gettime(CLOCK_MONOTONIC, &end);
 	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
 	timer += diff;
 	pthread_mutex_destroy(&maxLock);
 	pthread_mutex_destroy(&maxRowLock);
-//	printf("max is: %d row %d\n", maxVal, maxRow);
 	
+	// after all threads, swap the diagonal row with the maximum value row.
 	int *temp = mat[col];
 	mat[col] = mat[maxRow];
 	mat[maxRow] = temp;
-
-//	printMat(mat);
-	
-//	clock_gettime(CLOCK_REALTIME, &finish);
-//	ntime = finish.tv_nsec - start.tv_nsec;
-//	stime = (int) finish.tv_nsec - (int) start.tv_nsec;
-//	printf ("%d", stime);
-	
-//	pthread_exit(NULL);
 }
 
+// pthread method for way1
 void *paraMax(void *arg){
 	struct ptArg *myArg;
 	
+	// extract the arguments from the structure 
 	myArg = (struct ptArg *) arg;
 	int start = myArg->start;
 	int col = myArg->col;
 	int size = myArg->size;
 	int i;
+	
+	// initialize the local maximum with the first element
 	int localMax = mat[start][col];
 	int localRowMax = myArg->start;
 	
-	
-//	printf("start:%d col:%d size:%d\n", start, col, size);
+	// if the element is larger than the local maximum, update the local maximum 
 	for (i = start; i < start + size; i++){
 		if (abs(mat[i][col]) > localMax){
 			localMax = abs(mat[i][col]);
 			localRowMax = i;
 		}
 	}
-//	printf("Local Max value: %d, row: %d\n", localMax, localRowMax);
+	
+	// after we find the local maximum, compare it with the global maximum;
+	// the global maximum need to be locked for both read and write.
 	pthread_mutex_lock (&maxLock);
 	pthread_mutex_lock (&maxRowLock);
 	if (localMax > maxVal){
@@ -184,8 +179,11 @@ void printMat(int **mat){
 }
 
 int main(int argc, char **argv){
+	// code for extracting timing information into csv file
 	FILE *fp;
 	fp=fopen("way1Para.csv","w+");
+	
+	// looping over different size of matrix and benmark
 	for (power = 4; power < 12; power++){
 		N = pow(2, power);
 		timer = 0;
