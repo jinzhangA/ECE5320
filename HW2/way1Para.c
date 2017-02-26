@@ -191,7 +191,7 @@ int main(int argc, char **argv){
 		generateMat();
 		way1Sort(mat);
 		free(mat);
-		fprintf(fp, "%d, %llu\n", s, (long long unsigned int) timer);
+		fprintf(fp, "%d, %llu\n", power, (long long unsigned int) timer);
 	}
 	fclose(fp);
 	
