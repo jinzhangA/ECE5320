@@ -20,6 +20,7 @@ int maxVal = 0;
 int maxRow = 0;
 int **mat;
 int N;
+int power;
 uint64_t timer = 0;
 
 
@@ -60,7 +61,7 @@ int way1Sort(int **mat){
 	}
 //	clock_gettime(CLOCK_MONOTONIC, &end);
 //	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
-	printf("elapsed process CPU time = %llu nanoseconds\n", (long long unsigned int) timer);
+	printf("For 2^%d size, time = %llu nanoseconds\n", (long long unsigned int) timer);
 	return 0;
 }
 
@@ -183,9 +184,8 @@ void printMat(int **mat){
 }
 
 int main(int argc, char **argv){
-	int i = 4;
-	for (i = 4; i < 12; i++){
-		N = pow(2, i);
+	for (power = 4; power < 12; power++){
+		N = pow(2, power);
 		generateMat();
 		//	printMat(mat);
 		//	printf("\n");
