@@ -55,7 +55,7 @@ void way2Sort(){
 			values[j] = mat[j + i][i];
 		}
 		clock_gettime(CLOCK_MONOTONIC, &start);	
-		mergeSortPara(values, indexs, N - i);
+		mergeSort(values, indexs, N - i);
 		clock_gettime(CLOCK_MONOTONIC, &end);
 		diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
 		timer += diff;
@@ -72,7 +72,6 @@ void way2Sort(){
 			}
 			
 		}
-		printf("\n");
 		free(values);
 		free(indexs);
 	}
@@ -226,7 +225,7 @@ int main(int argc, char **argv){
 		copyMat();
 		way2Sort();
 		free(mat);
-		printf("elapsed process CPU time = %llu nanoseconds\n", (long long unsigned int) timer);
+		printf("2^%d time = %llu nanoseconds\n", power, (long long unsigned int) timer);
 	}
 	exit(0);
 }
