@@ -13,6 +13,7 @@ int way1Sort(int **mat);
 void maxAndSwap(int **mat, int col);
 int **mat;
 int power;
+uint64_t timer;
 int N;
 
 void **generateMat() {
@@ -39,8 +40,7 @@ int way1Sort(int **mat){
 		maxAndSwap(mat, i);
 	}
 	clock_gettime(CLOCK_MONOTONIC, &end);
-	diff = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
-	printf("2^%d time = %llu nanoseconds\n", power, (long long unsigned int) diff);
+	timer = BILLION * (end.tv_sec - start.tv_sec) + end.tv_nsec - start.tv_nsec;
 	return 0;
 }
 
