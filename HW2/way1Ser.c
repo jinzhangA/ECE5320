@@ -83,6 +83,7 @@ int main(int argc, char **argv){
 		generateMat();
 		way1Sort(mat);
 		free(mat);
+		printf("For 2^%d size, time = %llu nanoseconds\n", power, (long long unsigned int) timer);
 		fprintf(fp, "%d, %llu\n", power, (long long unsigned int) timer);
 	}
 	fclose(fp);
