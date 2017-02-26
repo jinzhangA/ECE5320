@@ -106,40 +106,40 @@ void mergeSort(int *values, int *indexs, int n){
 	
 }
 
-void mergeSortPara(int *values, int *indexs, int n){
-	int mid, i, *valueL, *valueR, *indexL, *indexR;
-	if (n < 2) return;
-	mid = n/2;
-	
-	valueL = (int *)malloc(mid*sizeof(int));
-	valueR = (int *)malloc((n - mid)*sizeof(int));
-	
-	indexL = (int *)malloc(mid*sizeof(int));
-	indexR = (int *)malloc((n - mid)*sizeof(int));
-	for (i = 0; i < mid; i++){
-		valueL[i] = values[i];
-		indexL[i] = indexs[i];
-	}
-	
-	for (i = mid; i < n; i++){
-		valueR[i - mid] = values[i];
-		indexR[i - mid] = indexs[i];
-	}
-	#pragma omp parallel sections
-	{
-		#pragma omp section
-		mergeSortPara(valueL, indexL, mid);
-		#pragma omp section
-		mergeSortPara(valueR, indexR, n - mid);
-		
-	}
-	merge(values, valueL, valueR, indexs, indexL, indexR, mid, n - mid);
-	free(valueL);
-	free(valueR);
-	free(indexL);
-	free(indexR);
-	
-}
+//void mergeSortPara(int *values, int *indexs, int n){
+//	int mid, i, *valueL, *valueR, *indexL, *indexR;
+//	if (n < 2) return;
+//	mid = n/2;
+//	
+//	valueL = (int *)malloc(mid*sizeof(int));
+//	valueR = (int *)malloc((n - mid)*sizeof(int));
+//	
+//	indexL = (int *)malloc(mid*sizeof(int));
+//	indexR = (int *)malloc((n - mid)*sizeof(int));
+//	for (i = 0; i < mid; i++){
+//		valueL[i] = values[i];
+//		indexL[i] = indexs[i];
+//	}
+//	
+//	for (i = mid; i < n; i++){
+//		valueR[i - mid] = values[i];
+//		indexR[i - mid] = indexs[i];
+//	}
+//	#pragma omp parallel sections
+//	{
+//		#pragma omp section
+//		mergeSortPara(valueL, indexL, mid);
+//		#pragma omp section
+//		mergeSortPara(valueR, indexR, n - mid);
+//		
+//	}
+//	merge(values, valueL, valueR, indexs, indexL, indexR, mid, n - mid);
+//	free(valueL);
+//	free(valueR);
+//	free(indexL);
+//	free(indexR);
+//	
+//}
 
 
 
